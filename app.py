@@ -60,7 +60,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 # 사용자 입력 처리
-if user_input := st.chat_input("학생이 궁금한 점을 물어보세요!:"):
+if user_input := st.chat_input("학생이 궁금한 점을 물어보세요!"):
     st.session_state.messages.append({"role": "user", "content": user_input})
     st.session_state.waiting_for_response = True
 
@@ -68,7 +68,7 @@ if user_input := st.chat_input("학생이 궁금한 점을 물어보세요!:"):
 if st.session_state.waiting_for_response:
     with st.chat_message("ai"):
         message_placeholder = st.empty()
-        message_placeholder.text("답변을 생성하고 있습니다...")
+        message_placeholder.text("대답을 생각하고 있어요.")
 
     assistant_response = asyncio.run(get_assistant_response(user_input))
     
