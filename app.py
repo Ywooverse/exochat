@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from openai import OpenAI
 import time
+import asyncio
 
 # OpenAI 클라이언트 설정
 client = OpenAI(api_key=st.secrets["API_KEY"])
@@ -13,32 +14,14 @@ st.title("외계행성계 챗봇 도우미")
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.assistant_id = "asst_ePVQMU5H2n9iOINxYbv35biN"
+    st.session_state.waiting_for_response = False
 
-# 채팅 히스토리를 표시할 컨테이너
-chat_container = st.container()
+if "thread_id" not in st.session_state:
+    thread = client.beta.threads.create()
+    st.session_state.thread_id = thread.id
 
-# 사용자 입력 받기 (페이지 맨 아래에 위치)
-user_input = st.chat_input("학생이 궁금한 점을 물어보세요!:")
-
-if user_input:
-    # 사용자 메시지 추가 및 즉시 표시
-    st.session_state.messages.append({"role": "학생", "content": user_input})
-    with chat_container:
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.write(message["content"])
-    
-    # 로딩 메시지 표시
-    with chat_container:
-        with st.chat_message("도우미"):
-            message_placeholder = st.empty()
-            message_placeholder.text("답변을 생성하고 있습니다...")
-
-    # 스레드 생성 또는 기존 스레드 사용
-    if "thread_id" not in st.session_state:
-        thread = client.beta.threads.create()
-        st.session_state.thread_id = thread.id
-
+# 비동기 함수 정의
+async def get_assistant_response(user_input):
     # 메시지 추가
     client.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
@@ -54,7 +37,7 @@ if user_input:
 
     # 실행 완료 대기
     while run.status != "completed":
-        time.sleep(1)
+        await asyncio.sleep(1)
         run = client.beta.threads.runs.retrieve(
             thread_id=st.session_state.thread_id,
             run_id=run.id
@@ -65,21 +48,37 @@ if user_input:
         thread_id=st.session_state.thread_id
     )
 
-    # 새 메시지 추가 및 표시
     for message in messages.data:
         if message.role == "assistant" and message.content[0].type == "text":
-            assistant_message = message.content[0].text.value
-            st.session_state.messages.append({"role": "도우미", "content": assistant_message})
-            message_placeholder.text(assistant_message)
-            break
+            return message.content[0].text.value
 
-# 대화 내용 표시
-with chat_container:
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
+    return "죄송합니다. 응답을 생성하는 데 문제가 발생했습니다."
 
-# 자동 스크롤을 위한 JavaScript 실행
+# 채팅 히스토리 표시
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
+# 사용자 입력 처리
+if user_input := st.chat_input("학생이 궁금한 점을 물어보세요!:"):
+    st.session_state.messages.append({"role": "학생", "content": user_input})
+    st.session_state.waiting_for_response = True
+
+# 비동기 응답 처리
+if st.session_state.waiting_for_response:
+    with st.chat_message("도우미"):
+        message_placeholder = st.empty()
+        message_placeholder.text("답변을 생성하고 있습니다...")
+
+    assistant_response = asyncio.run(get_assistant_response(user_input))
+    
+    st.session_state.messages.append({"role": "도우미", "content": assistant_response})
+    message_placeholder.text(assistant_response)
+    st.session_state.waiting_for_response = False
+
+    st.rerun()
+
+# 자동 스크롤
 st.markdown("""
 <script>
     var element = window.parent.document.querySelector('section.main');
