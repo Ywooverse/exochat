@@ -3,6 +3,8 @@ import streamlit as st
 from openai import OpenAI
 import time
 
+secret = st.secrets["api_keys"]["secret"]
+
 # Streamlit Cloud에서 환경 변수 불러오기
 API_KEY = os.getenv(secret)
 
