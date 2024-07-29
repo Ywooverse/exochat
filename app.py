@@ -4,7 +4,7 @@ from openai import OpenAI
 import time
 
 # Streamlit Cloud에서 환경 변수 불러오기
-API_KEY = os.getenv("api_key_hide")
+API_KEY = os.getenv(secret)
 
 # OpenAI 클라이언트 설정
 client = OpenAI(api_key=API_KEY)
