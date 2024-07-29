@@ -15,7 +15,7 @@ if "messages" not in st.session_state:
     st.session_state.assistant_id = "asst_ePVQMU5H2n9iOINxYbv35biN"
 
 # 사용자 입력 받기
-user_input = st.text_input("메시지를 입력하세요:")
+user_input = st.chat_input("메시지를 입력하세요:")
 
 if user_input:
     # 사용자 메시지 추가
