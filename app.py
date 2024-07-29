@@ -21,8 +21,18 @@ chat_container = st.container()
 user_input = st.chat_input("학생이 궁금한 점을 물어보세요!:")
 
 if user_input:
-    # 사용자 메시지 추가
+    # 사용자 메시지 추가 및 즉시 표시
     st.session_state.messages.append({"role": "학생", "content": user_input})
+    with chat_container:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.write(message["content"])
+    
+    # 로딩 메시지 표시
+    with chat_container:
+        with st.chat_message("도우미"):
+            message_placeholder = st.empty()
+            message_placeholder.text("답변을 생성하고 있습니다...")
 
     # 스레드 생성 또는 기존 스레드 사용
     if "thread_id" not in st.session_state:
@@ -55,10 +65,12 @@ if user_input:
         thread_id=st.session_state.thread_id
     )
 
-    # 새 메시지 추가
+    # 새 메시지 추가 및 표시
     for message in messages.data:
         if message.role == "assistant" and message.content[0].type == "text":
-            st.session_state.messages.append({"role": "도우미", "content": message.content[0].text.value})
+            assistant_message = message.content[0].text.value
+            st.session_state.messages.append({"role": "도우미", "content": assistant_message})
+            message_placeholder.text(assistant_message)
             break
 
 # 대화 내용 표시
