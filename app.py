@@ -61,18 +61,18 @@ for message in st.session_state.messages:
 
 # 사용자 입력 처리
 if user_input := st.chat_input("학생이 궁금한 점을 물어보세요!:"):
-    st.session_state.messages.append({"role": "학생", "content": user_input})
+    st.session_state.messages.append({"role": "user", "content": user_input})
     st.session_state.waiting_for_response = True
 
 # 비동기 응답 처리
 if st.session_state.waiting_for_response:
-    with st.chat_message("도우미"):
+    with st.chat_message("ai"):
         message_placeholder = st.empty()
         message_placeholder.text("답변을 생성하고 있습니다...")
 
     assistant_response = asyncio.run(get_assistant_response(user_input))
     
-    st.session_state.messages.append({"role": "도우미", "content": assistant_response})
+    st.session_state.messages.append({"role": "ai", "content": assistant_response})
     message_placeholder.text(assistant_response)
     st.session_state.waiting_for_response = False
 
