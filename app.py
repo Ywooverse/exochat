@@ -7,19 +7,22 @@ import time
 client = OpenAI(api_key=st.secrets["API_KEY"])
 
 # Streamlit 앱 설정
-st.title("OpenAI Assistant 챗봇")
+st.title("외계행성계 챗봇 도우미")
 
 # 세션 상태 초기화
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.assistant_id = "asst_ePVQMU5H2n9iOINxYbv35biN"
 
-# 사용자 입력 받기
-user_input = st.chat_input("메시지를 입력하세요:")
+# 채팅 히스토리를 표시할 컨테이너
+chat_container = st.container()
+
+# 사용자 입력 받기 (페이지 맨 아래에 위치)
+user_input = st.chat_input("학생이 궁금한 점을 물어보세요!:")
 
 if user_input:
     # 사용자 메시지 추가
-    st.session_state.messages.append({"role": "user", "content": user_input})
+    st.session_state.messages.append({"role": "학생", "content": user_input})
 
     # 스레드 생성 또는 기존 스레드 사용
     if "thread_id" not in st.session_state:
@@ -55,10 +58,19 @@ if user_input:
     # 새 메시지 추가
     for message in messages.data:
         if message.role == "assistant" and message.content[0].type == "text":
-            st.session_state.messages.append({"role": "assistant", "content": message.content[0].text.value})
+            st.session_state.messages.append({"role": "도우미", "content": message.content[0].text.value})
             break
 
 # 대화 내용 표시
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
+with chat_container:
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
+
+# 자동 스크롤을 위한 JavaScript 실행
+st.markdown("""
+<script>
+    var element = window.parent.document.querySelector('section.main');
+    element.scrollTop = element.scrollHeight;
+</script>
+""", unsafe_allow_html=True)
