@@ -14,8 +14,13 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.assistant_id = "asst_ePVQMU5H2n9iOINxYbv35biN"
 
+# 대화 내용 표시
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
 # 사용자 입력 받기
-user_input = st.text_input("메시지를 입력하세요:")
+user_input = st.text_input("메시지를 입력하세요:", help="엔터를 눌러주세요")
 
 if user_input:
     # 사용자 메시지 추가
@@ -60,12 +65,8 @@ if user_input:
 
     # 입력창 비우기
     st.session_state.user_input = ""
-
-# 대화 내용 표시
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
+    st.experimental_rerun()
 
 # 입력창 아래쪽으로 이동 및 안내 메시지 추가
 with st.container():
-    user_input = st.text_input("메시지를 입력하세요:", value=st.session_state.get('user_input', ''), key='user_input', help="엔터를 눌러주세요")
+    user_input = st.text_input("메시지를 입력하세요:", value="", key='new_user_input', help="엔터를 눌러주세요")
