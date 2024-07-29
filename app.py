@@ -58,7 +58,14 @@ if user_input:
             st.session_state.messages.append({"role": "assistant", "content": message.content[0].text.value})
             break
 
+    # 입력창 비우기
+    st.session_state.user_input = ""
+
 # 대화 내용 표시
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
+
+# 입력창 아래쪽으로 이동 및 안내 메시지 추가
+with st.container():
+    user_input = st.text_input("메시지를 입력하세요:", value=st.session_state.get('user_input', ''), key='user_input', help="엔터를 눌러주세요")
