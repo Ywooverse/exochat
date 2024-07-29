@@ -3,7 +3,7 @@ import streamlit as st
 from openai import OpenAI
 import time
 
-API_KEY = api_key
+API_KEY = api_key_hide
 
 # OpenAI 클라이언트 설정
 client = OpenAI(api_key=API_KEY)
