@@ -4,7 +4,7 @@ from openai import OpenAI
 import time
 
 # OpenAI 클라이언트 설정
-client = OpenAI(api_key=API_KEY)
+client = OpenAI(api_key=st.secrets["API_KEY"])
 
 # Streamlit 앱 설정
 st.title("OpenAI Assistant 챗봇")
