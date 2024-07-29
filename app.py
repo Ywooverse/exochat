@@ -2,10 +2,8 @@ import os
 import streamlit as st
 from openai import OpenAI
 import time
-from dotenv import load_dotenv
 
-load_dotenv()
-API_KEY = os.getenv("OPENAI_API_KEY")
+API_KEY = api_key
 
 # OpenAI 클라이언트 설정
 client = OpenAI(api_key=API_KEY)
